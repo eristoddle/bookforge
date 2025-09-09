@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  bookforge:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=true
+      - LOG_LEVEL=INFO
+      - REDIS_URL=redis://redis:6379/0
+      - TEMP_DIR=/app/temp_books
+      - OUTPUT_DIR=/app/generated_epubs
+      - MAX_FILE_SIZE=50MB
+      - DEFAULT_THEME=modern
+      - EPUB_VALIDATION=true
+      - MAX_CONCURRENT_JOBS=10
+      - JOB_TIMEOUT=300
+    volumes:
+      - ./temp_books:/app/temp_books
+      - ./generated_epubs:/app/generated_epubs
+      - ./.env:/app/.env:ro
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Optional: Celery worker for background tasks
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - DEBUG=true
+      - LOG_LEVEL=INFO
+      - REDIS_URL=redis://redis:6379/0
+      - TEMP_DIR=/app/temp_books
+      - OUTPUT_DIR=/app/generated_epubs
+    volumes:
+      - ./temp_books:/app/temp_books
+      - ./generated_epubs:/app/generated_epubs
+      - ./.env:/app/.env:ro
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    command: ["python", "-m", "celery", "worker", "-A", "bookforge.core.job_manager", "--loglevel=info"]
+
+volumes:
+  redis_data:
+
+networks:
+  default:
+    name: bookforge_network
