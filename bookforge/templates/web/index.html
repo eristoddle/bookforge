@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookForge - Beautiful EPUB Generation</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <meta name="description" content="Transform your markdown files into beautiful, professional ebooks with BookForge - the cloud-based alternative to Vellum.">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <h1>📚 BookForge</h1>
+            <p>Transform your markdown into beautiful ebooks</p>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="container">
+            <ul class="nav-list">
+                <li><a href="#upload" class="nav-link active">Create EPUB</a></li>
+                <li><a href="/docs" class="nav-link">API Docs</a></li>
+                <li><a href="https://github.com/bookforge/bookforge" class="nav-link">GitHub</a></li>
+                <li><a href="#help" class="nav-link">Help</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <!-- Alerts -->
+            <div id="alerts"></div>
+            
+            <!-- Loading -->
+            <div id="loading" style="display: none;"></div>
+
+            <!-- Upload Section -->
+            <section id="upload" class="card">
+                <h2>📖 Create Your EPUB</h2>
+                <p>Choose how you'd like to create your ebook:</p>
+                
+                <!-- Tab Selection -->
+                <div class="tab-container">
+                    <div class="tabs">
+                        <button class="tab-button active" onclick="showTab('files')">📁 Upload Files</button>
+                        <button class="tab-button" onclick="showTab('github')">🌐 From GitHub</button>
+                    </div>
+                </div>
+
+                <!-- Files Tab -->
+                <div id="files-tab" class="tab-content active">
+                    <div class="grid grid-2">
+                        <!-- File Upload -->
+                        <div>
+                            <h3>Select Markdown Files</h3>
+                            <div id="file-upload" class="file-upload">
+                                <div class="file-upload-icon">📄</div>
+                                <div class="file-upload-text">
+                                    <strong>Drop your markdown files here</strong><br>
+                                    or click to browse
+                                </div>
+                                <input type="file" id="file-input" multiple accept=".md,.markdown" style="display: none;">
+                            </div>
+                            <div id="file-list" class="file-list">
+                                <p class="text-muted">No files selected</p>
+                            </div>
+                        </div>
+
+                        <!-- Book Details Form -->
+                        <div id="files-form-section" style="display: none;">
+                            <h3>Book Details</h3>
+                            <form id="files-form">
+                                <div class="form-group">
+                                    <label class="form-label" for="files-title">Title *</label>
+                                    <input type="text" id="files-title" name="title" class="form-input" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label" for="files-author">Author *</label>
+                                    <input type="text" id="files-author" name="author" class="form-input" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label" for="files-description">Description</label>
+                                    <textarea id="files-description" name="description" class="form-textarea" placeholder="Brief description of your book..."></textarea>
+                                </div>
+                                
+                                <div class="grid grid-2">
+                                    <div class="form-group">
+                                        <label class="form-label" for="files-language">Language</label>
+                                        <select id="files-language" name="language" class="form-select">
+                                            <option value="en">English</option>
+                                            <option value="es">Spanish</option>
+                                            <option value="fr">French</option>
+                                            <option value="de">German</option>
+                                            <option value="it">Italian</option>
+                                            <option value="pt">Portuguese</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label" for="files-publisher">Publisher</label>
+                                        <input type="text" id="files-publisher" name="publisher" class="form-input">
+                                    </div>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary btn-large btn-full">
+                                    🚀 Generate EPUB
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GitHub Tab -->
+                <div id="github-tab" class="tab-content">
+                    <div class="grid grid-2">
+                        <div>
+                            <h3>GitHub Repository</h3>
+                            <form id="github-form">
+                                <div class="form-group">
+                                    <label class="form-label" for="github-url">Repository URL *</label>
+                                    <input type="url" id="github-url" name="github_url" class="form-input" 
+                                           placeholder="https://github.com/username/repository" required>
+                                    <small class="text-muted">Enter the URL of your GitHub repository containing markdown files</small>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label" for="folder-path">Folder Path (optional)</label>
+                                    <input type="text" id="folder-path" name="folder_path" class="form-input" 
+                                           placeholder="docs">
+                                    <small class="text-muted">Specific folder containing your markdown files (leave empty for entire repo)</small>
+                                </div>
+                                
+                                <div class="grid grid-2">
+                                    <div class="form-group">
+                                        <label class="form-label" for="github-title">Title</label>
+                                        <input type="text" id="github-title" name="title" class="form-input" 
+                                               placeholder="Auto-detected from repository">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label" for="github-author">Author</label>
+                                        <input type="text" id="github-author" name="author" class="form-input" 
+                                               placeholder="Auto-detected from repository">
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label" for="github-description">Description</label>
+                                    <textarea id="github-description" name="description" class="form-textarea" 
+                                              placeholder="Auto-detected from repository or enter custom description..."></textarea>
+                                </div>
+                                
+                                <div class="grid grid-2">
+                                    <div class="form-group">
+                                        <label class="form-label" for="github-language">Language</label>
+                                        <select id="github-language" name="language" class="form-select">
+                                            <option value="en">English</option>
+                                            <option value="es">Spanish</option>
+                                            <option value="fr">French</option>
+                                            <option value="de">German</option>
+                                            <option value="it">Italian</option>
+                                            <option value="pt">Portuguese</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label" for="github-publisher">Publisher</label>
+                                        <input type="text" id="github-publisher" name="publisher" class="form-input">
+                                    </div>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary btn-large btn-full">
+                                    🌐 Generate from GitHub
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <div>
+                            <h3>📋 GitHub Tips</h3>
+                            <div class="alert alert-info">
+                                <h4>Repository Structure</h4>
+                                <p>For best results, organize your markdown files like this:</p>
+                                <pre><code>your-book/
+├── 01-introduction.md
+├── 02-chapter-one.md
+├── 03-chapter-two.md
+└── 04-conclusion.md</code></pre>
+                                
+                                <h4>Supported URLs</h4>
+                                <ul>
+                                    <li>Entire repository: <code>github.com/user/repo</code></li>
+                                    <li>Specific branch: <code>github.com/user/repo/tree/main</code></li>
+                                    <li>Folder in repo: <code>github.com/user/repo/tree/main/docs</code></li>
+                                </ul>
+                                
+                                <h4>Private Repositories</h4>
+                                <p>For private repos, you'll need to configure a GitHub token in the server settings.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Theme Selection -->
+            <section class="card">
+                <h2>🎨 Choose Your Theme</h2>
+                <p>Select a theme that matches your book's style:</p>
+                
+                <div class="grid grid-3">
+                    <!-- Modern Theme -->
+                    <div class="theme-preview selected" data-theme="modern" onclick="selectTheme('modern')">
+                        <div class="theme-preview-header">
+                            <input type="radio" name="theme" value="modern" checked style="margin-right: 0.5rem;">
+                            <strong>Modern</strong>
+                        </div>
+                        <div class="theme-preview-content">
+                            <h4 style="margin: 0 0 0.5rem 0; font-family: -apple-system, sans-serif;">Chapter Title</h4>
+                            <p style="margin: 0; font-size: 0.85rem; line-height: 1.5;">Clean, contemporary design with sans-serif fonts. Perfect for technical documentation, business books, and modern fiction.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Classic Theme -->
+                    <div class="theme-preview" data-theme="classic" onclick="selectTheme('classic')">
+                        <div class="theme-preview-header">
+                            <input type="radio" name="theme" value="classic" style="margin-right: 0.5rem;">
+                            <strong>Classic</strong>
+                        </div>
+                        <div class="theme-preview-content">
+                            <h4 style="margin: 0 0 0.5rem 0; font-family: 'Times New Roman', serif; text-align: center;">Chapter Title</h4>
+                            <p style="margin: 0; font-size: 0.85rem; line-height: 1.6; font-family: 'Times New Roman', serif; text-indent: 1rem;">Traditional book styling with serif fonts and classic typography. Ideal for literature, academic works, and formal publications.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Minimal Theme -->
+                    <div class="theme-preview" data-theme="minimal" onclick="selectTheme('minimal')">
+                        <div class="theme-preview-header">
+                            <input type="radio" name="theme" value="minimal" style="margin-right: 0.5rem;">
+                            <strong>Minimal</strong>
+                        </div>
+                        <div class="theme-preview-content">
+                            <h4 style="margin: 0 0 0.5rem 0; font-family: Georgia, serif; font-weight: 600;">Chapter Title</h4>
+                            <p style="margin: 0; font-size: 0.85rem; line-height: 1.7; font-family: Georgia, serif;">Ultra-clean, distraction-free layout with elegant typography. Great for focused reading experiences and contemplative works.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Status Section -->
+            <div id="status-section" style="display: none;">
+                <div id="job-status"></div>
+            </div>
+
+            <!-- Download Section -->
+            <div id="download-section" style="display: none;"></div>
+
+            <!-- Validation Section -->
+            <div id="validation-section" style="display: none;"></div>
+
+            <!-- Recent Jobs -->
+            <div id="recent-jobs"></div>
+
+            <!-- Help Section -->
+            <section id="help" class="card">
+                <h2>❓ Need Help?</h2>
+                <div class="grid grid-2">
+                    <div>
+                        <h3>📖 Quick Start</h3>
+                        <ul>
+                            <li>Upload your markdown files or provide a GitHub URL</li>
+                            <li>Fill in your book details (title, author, etc.)</li>
+                            <li>Choose a theme that matches your content</li>
+                            <li>Click generate and wait for your EPUB!</li>
+                        </ul>
+                        
+                        <h3>📝 Markdown Tips</h3>
+                        <ul>
+                            <li>Start each chapter with an H1 heading (<code># Chapter Title</code>)</li>
+                            <li>Use numbered prefixes for proper chapter ordering</li>
+                            <li>Include images with proper markdown syntax</li>
+                            <li>Test your markdown in a preview tool first</li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h3>🚀 API & CLI</h3>
+                        <p>For developers and power users:</p>
+                        <ul>
+                            <li><a href="/docs" class="nav-link">📖 Full API Documentation</a></li>
+                            <li><strong>CLI:</strong> <code>pip install bookforge</code></li>
+                            <li><strong>GitHub Actions:</strong> Automate your ebook builds</li>
+                            <li><strong>Custom Integration:</strong> Embed in your apps</li>
+                        </ul>
+                        
+                        <h3>🎨 Themes</h3>
+                        <ul>
+                            <li><strong>Modern:</strong> Technical docs, business books</li>
+                            <li><strong>Classic:</strong> Literature, academic works</li>
+                            <li><strong>Minimal:</strong> Focused reading, essays</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2023 BookForge. Open source ebook generation for everyone.</p>
+            <p>
+                <a href="https://github.com/bookforge/bookforge" style="color: white;">GitHub</a> | 
+                <a href="/docs" style="color: white;">API Docs</a> | 
+                <a href="https://github.com/bookforge/bookforge/issues" style="color: white;">Support</a>
+            </p>
+        </div>
+    </footer>
+
+    <script src="/static/js/app.js"></script>
+    <script>
+        // Tab functionality
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active from all buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+    </script>
+    
+    <style>
+        /* Tab Styles */
+        .tab-container {
+            margin-bottom: 2rem;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 2rem;
+        }
+        
+        .tab-button {
+            background: none;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s ease;
+        }
+        
+        .tab-button:hover {
+            color: var(--primary-color);
+        }
+        
+        .tab-button.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .job-item {
+            margin-bottom: 1rem;
+        }
+        
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+    </style>
+</body>
+</html>
