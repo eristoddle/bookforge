@@ -47,26 +47,7 @@ services:
       retries: 3
       start_period: 30s
 
-  # Optional: Celery worker for background tasks
-  worker:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    environment:
-      - DEBUG=true
-      - LOG_LEVEL=INFO
-      - REDIS_URL=redis://redis:6379/0
-      - TEMP_DIR=/app/temp_books
-      - OUTPUT_DIR=/app/generated_epubs
-    volumes:
-      - ./temp_books:/app/temp_books
-      - ./generated_epubs:/app/generated_epubs
-      - ./.env:/app/.env:ro
-    depends_on:
-      redis:
-        condition: service_healthy
-    restart: unless-stopped
-    command: ["python", "-m", "celery", "-A", "bookforge.core.job_manager", "worker", "--loglevel=info"]
+
 
 volumes:
   redis_data:
