@@ -19,7 +19,7 @@ bookforge serve --host 0.0.0.0 --port 8000
 docker run -p 8000:8000 bookforge/bookforge:latest
 
 # Or build from source
-git clone https://github.com/bookforge/bookforge.git
+git clone https://github.com/eristoddle/bookforge.git
 cd bookforge
 docker build -t bookforge .
 docker run -p 8000:8000 bookforge
@@ -146,7 +146,7 @@ http {
     server {
         listen 80;
         server_name your-domain.com;
-        
+
         # Redirect HTTP to HTTPS
         return 301 https://$server_name$request_uri;
     }
@@ -182,7 +182,7 @@ http {
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
-            
+
             # Timeouts for long-running requests
             proxy_connect_timeout 60s;
             proxy_send_timeout 300s;
@@ -197,7 +197,7 @@ http {
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
-            
+
             # Extended timeouts for uploads
             proxy_connect_timeout 60s;
             proxy_send_timeout 600s;
@@ -279,10 +279,10 @@ http {
 steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', 'gcr.io/$PROJECT_ID/bookforge', '.']
-  
+
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'gcr.io/$PROJECT_ID/bookforge']
-  
+
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: 'gcloud'
     args:
@@ -324,7 +324,7 @@ run:
   "name": "BookForge",
   "description": "Beautiful EPUB generation service",
   "image": "heroku/python",
-  "repository": "https://github.com/bookforge/bookforge",
+  "repository": "https://github.com/eristoddle/bookforge",
   "keywords": ["epub", "ebook", "markdown", "publishing"],
   "env": {
     "DEBUG": {
@@ -446,7 +446,7 @@ handlers:
     level: INFO
     formatter: default
     stream: ext://sys.stdout
-  
+
   file:
     class: logging.handlers.RotatingFileHandler
     level: DEBUG
@@ -479,9 +479,9 @@ async def detailed_health():
         "storage": check_storage(),
         "epubcheck": check_epubcheck()
     }
-    
+
     all_healthy = all(checks.values())
-    
+
     return {
         "status": "healthy" if all_healthy else "unhealthy",
         "checks": checks,
@@ -576,7 +576,7 @@ services:
       - REDIS_URL=redis://redis:6379/0
     depends_on:
       - redis
-    
+
   nginx:
     image: nginx:alpine
     ports:
@@ -588,7 +588,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    
+
 # Scale with: docker-compose up --scale bookforge=3
 ```
 
@@ -605,7 +605,7 @@ upstream bookforge_backend {
 
 server {
     listen 80;
-    
+
     location / {
         proxy_pass http://bookforge_backend;
         proxy_set_header Host $host;

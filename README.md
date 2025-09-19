@@ -250,7 +250,7 @@ if status.json()["status"] == "completed":
 ### **Installation**
 ```bash
 # Clone repository
-git clone https://github.com/bookforge/bookforge.git
+git clone https://github.com/eristoddle/bookforge.git
 cd bookforge
 
 # Install dependencies
@@ -420,7 +420,7 @@ pipeline {
 ### **Local Development**
 ```bash
 # Clone and setup
-git clone https://github.com/bookforge/bookforge.git
+git clone https://github.com/eristoddle/bookforge.git
 cd bookforge
 pip install -e ".[dev]"
 
@@ -589,7 +589,7 @@ BookForge is inspired by [Vellum](https://vellum.pub) - the gold standard for eb
 
 **📚 Transform your markdown into beautiful ebooks**
 
-[🌐 Try Web Interface](http://localhost:8000) • [📖 Read Docs](docs/) • [🐛 Report Issues](https://github.com/bookforge/bookforge/issues) • [💬 Join Discussion](https://github.com/bookforge/bookforge/discussions)
+[🌐 Try Web Interface](http://localhost:8000) • [📖 Read Docs](docs/) • [🐛 Report Issues](https://github.com/eristoddle/bookforge/issues) • [💬 Join Discussion](https://github.com/eristoddle/bookforge/discussions)
 
 **Made with ❤️ by the BookForge team**
 

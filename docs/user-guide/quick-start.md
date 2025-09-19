@@ -13,7 +13,7 @@ pip install bookforge
 ### Option 2: From Source
 
 ```bash
-git clone https://github.com/bookforge/bookforge.git
+git clone https://github.com/eristoddle/bookforge.git
 cd bookforge
 pip install -e .
 ```
@@ -97,7 +97,7 @@ docker run -p 8000:8000 bookforge/bookforge
 BookForge includes three beautiful themes:
 
 - **Modern** - Clean, contemporary design perfect for technical books
-- **Classic** - Traditional typography ideal for fiction and literature  
+- **Classic** - Traditional typography ideal for fiction and literature
 - **Minimal** - Ultra-clean layout for distraction-free reading
 
 Preview themes:
@@ -194,12 +194,12 @@ Now that you've created your first EPUB, explore these advanced features:
 ### Getting Help
 
 - Check the [full documentation](../README.md)
-- Search [GitHub Issues](https://github.com/bookforge/bookforge/issues)
-- Ask in [GitHub Discussions](https://github.com/bookforge/bookforge/discussions)
+- Search [GitHub Issues](https://github.com/eristoddle/bookforge/issues)
+- Ask in [GitHub Discussions](https://github.com/eristoddle/bookforge/discussions)
 
 ## 🎉 Success!
 
-Congratulations! You've successfully generated your first EPUB with BookForge. Your book is ready to be shared with the world! 
+Congratulations! You've successfully generated your first EPUB with BookForge. Your book is ready to be shared with the world!
 
 Consider uploading to platforms like:
 - Amazon Kindle Direct Publishing

@@ -56,10 +56,10 @@ dev = [
 bookforge = "bookforge.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/bookforge/bookforge"
+Homepage = "https://github.com/eristoddle/bookforge"
 Documentation = "https://docs.bookforge.dev"
-Repository = "https://github.com/bookforge/bookforge"
-"Bug Reports" = "https://github.com/bookforge/bookforge/issues"
+Repository = "https://github.com/eristoddle/bookforge"
+"Bug Reports" = "https://github.com/eristoddle/bookforge/issues"
 
 [tool.setuptools.packages.find]
 where = ["."]
