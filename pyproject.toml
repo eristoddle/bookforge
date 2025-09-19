@@ -8,11 +8,11 @@ version = "0.1.0"
 description = "Beautiful EPUB generation service - the cloud-based alternative to Vellum"
 authors = [{name = "BookForge Team"}]
 readme = "README.md"
+license = "MIT"
 requires-python = ">=3.9"
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
@@ -64,6 +64,21 @@ Repository = "https://github.com/eristoddle/bookforge"
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["bookforge*"]
+
+[tool.setuptools.package-data]
+bookforge = [
+    "templates/*.html",
+    "templates/*.xhtml", 
+    "templates/*.xml",
+    "templates/*.ncx",
+    "templates/*.opf",
+    "templates/web/*.html",
+    "templates/themes/*.css",
+    "static/css/*.css",
+    "static/js/*.js",
+    "static/images/*",
+    "themes/*.css",
+]
 
 [tool.black]
 line-length = 88

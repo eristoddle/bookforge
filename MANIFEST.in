@@ -1,0 +1,7 @@
+include README.md
+include LICENSE
+recursive-include bookforge/templates *.html *.xhtml *.xml *.ncx *.opf *.css
+recursive-include bookforge/static *.css *.js *.png *.jpg *.jpeg *.gif *.svg
+recursive-include bookforge/themes *.css
+recursive-exclude * __pycache__
+recursive-exclude * *.py[co]
