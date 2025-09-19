@@ -20,6 +20,11 @@ help:
 	@echo ""
 	@echo "🧹 Cleanup:"
 	@echo "  make clean       Clean generated files"
+	@echo ""
+	@echo "📦 Release:"
+	@echo "  make release-dry-run version=0.1.1    Test release process"
+	@echo "  make release-test version=0.1.1       Release to Test PyPI"
+	@echo "  make release version=0.1.1            Release to PyPI"
 
 # Installation
 install:
@@ -79,6 +84,19 @@ build:
 # Install from local build
 install-local: build
 	pip install dist/*.whl
+
+# Release management
+release-dry-run:
+	@echo "🧪 Testing release process..."
+	python release.py $(version) --dry-run
+
+release-test:
+	@echo "📦 Releasing to Test PyPI..."
+	python release.py $(version) --test-pypi
+
+release:
+	@echo "🚀 Releasing to PyPI..."
+	python release.py $(version)
 
 # Quick development setup
 setup: install example
