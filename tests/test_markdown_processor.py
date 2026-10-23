@@ -26,3 +26,10 @@ def test_footnotes_do_not_carry_into_the_next_chapter():
     assert "a note" in chapters[0].content
     assert "a note" not in chapters[1].content
     assert "footnote" not in chapters[1].content
+
+
+def test_a_chapter_without_a_heading_is_named_after_its_file_without_the_number():
+    processor = MarkdownProcessor()
+    assert processor.process_markdown_file("Text only.\n", "03_the_storm.md").title == "The Storm"
+    assert processor.process_markdown_file("Text only.\n", "harbor-lights.md").title == "Harbor Lights"
+    assert processor.process_markdown_file("Text only.\n", "07.md").title == "07"

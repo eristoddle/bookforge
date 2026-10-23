@@ -61,7 +61,9 @@ class MarkdownProcessor:
         # Extract title from first H1 or use filename
         title = self._extract_title(content)
         if not title:
-            title = chapter_stem(filename).replace('_', ' ').title()
+            # Without a heading the name stands in, less any order number: 01_the_storm -> The Storm
+            stem = re.sub(r'^\d+[_\-. ]+', '', chapter_stem(filename)) or chapter_stem(filename)
+            title = stem.replace('_', ' ').replace('-', ' ').title()
         
         # Convert markdown to HTML. One Markdown instance serves every chapter, so
         # reset it first: otherwise footnotes and heading ids carry over.
