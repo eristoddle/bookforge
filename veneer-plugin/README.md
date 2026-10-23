@@ -39,4 +39,11 @@ To try it in Veneer: a dev build has **Load plugin from folder** in the palette;
 
 ## Releasing
 
-Veneer installs a plugin from the **latest GitHub release** of a repository, which must carry `manifest.json` and `main.js` as assets. This repository's `v*` tags already make releases for the Python package, so the two would collide. The way out is not decided yet; see the notes in `docs/VENEER_DIRECTION.md`.
+The plugin releases with the server, on one version line. `python release.py <version>` (see `RELEASE_QUICKSTART.md`) bumps `manifest.json` and `package.json` here with the Python package, then tags `v<version>`. On that tag, `.github/workflows/release.yml` does two things:
+
+1. It checks that the manifest's version matches the tag, then typechecks, tests, and builds the plugin. A failure stops the release before anything goes to PyPI.
+2. It publishes to PyPI and creates the GitHub release with `manifest.json` and `main.js` attached.
+
+Writers install it in Veneer from Settings, Plugins, Install from GitHub, with `eristoddle/bookforge`. "Check for updates" sees each new tag.
+
+Never change the manifest's `id`; Veneer refuses an update with a different one. When the plugin needs a newer `@veneer/api`, bump the dependency and `apiVersion` together.

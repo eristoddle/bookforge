@@ -48,12 +48,14 @@ Use [Semantic Versioning](https://semver.org/):
 
 - `pyproject.toml` - Package metadata
 - `bookforge/__init__.py` - Python module version
+- `veneer-plugin/manifest.json`, `veneer-plugin/package.json` - the Veneer plugin, which releases with the server
 
 ## What Gets Created
 
 - Git commit with version changes
 - Git tag (e.g., `v0.1.1`)
 - PyPI package upload
+- GitHub release (by the workflow) with the Veneer plugin's `manifest.json` and `main.js` attached
 - GitHub push (commits + tags)
 
 ## Troubleshooting

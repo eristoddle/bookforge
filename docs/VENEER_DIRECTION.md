@@ -17,7 +17,7 @@ Built against `@veneer/api` 0.40.0, following Veneer's `docs/handoff/bookforge-p
 | 3. Make the EPUB | Built and tested: `saveNow`, frontmatter stripped, chapter links rewritten, multipart upload in order, token in `api.secrets` and an `Authorization` header. |
 | 4. Progress | Built and tested: polls `/status`, shows the state above the form, and raises a notice on success or failure, with the server's own error. |
 | 5. Save | Built and tested: downloads bytes, then `api.export.saveAs`. |
-| Release from GitHub | **Not done**: see "Releasing" below. |
+| Release from GitHub | Set up (option A below): every BookForge release carries the plugin. Not yet exercised: no release has been cut. |
 
 Verified: 39 Vitest tests on the fake host; 12 pytest tests for the server; and one run in the real Veneer app (a built Electron app driven by Playwright) against a real BookForge server with a token set. That run left a chapter out, reordered, saved the token, made the EPUB, and saved it. The EPUB's chapter order, links, metadata, and lack of frontmatter were checked, with no console errors.
 
@@ -47,12 +47,13 @@ Verified: 39 Vitest tests on the fake host; 12 pytest tests for the server; and 
 4. **The fake host keeps `projectData` across `switchProject`.** The real one is per project. This was harmless here, but a plugin test of a project switch could pass falsely.
 5. **Installing from GitHub assumes the plugin is at the repository root.** A branch install reads `manifest.json` and `main.js` from the root only (`src/main/plugin-repo.ts`), so a plugin in a subfolder of a larger repository, like this one, can't be installed from a branch. Release assets are not affected.
 
-## Releasing (a decision)
+## Releasing (decided 2026-10-23: one release line)
 
-Veneer installs a plugin from a repository's **latest GitHub release**, which must carry `manifest.json` and `main.js`, and "Check for updates" compares tags. This repository's `v*` tags already create releases for the PyPI package, so plugin and server releases would replace each other as "latest". The options:
+Veneer installs a plugin from a repository's **latest GitHub release**, which must carry `manifest.json` and `main.js`, and "Check for updates" compares tags. This repository's `v*` tags already made releases for the PyPI package, so the plugin now rides on them, with one version for both:
 
-- **A. One release line.** `release.yml` also builds the plugin and attaches `manifest.json` and `main.js` to every BookForge release, so the plugin's version follows the server's.
-- **B. Its own repository** for the plugin (or the community plugin repo). The server and the plugin then release separately.
-- **C. No GitHub install for now.** Build with `npm run build` and install from the folder or a zip in Veneer's Settings, Plugins. (A branch install doesn't help here: it reads only the repository root; see gap 5.)
+- `release.py` bumps `veneer-plugin/manifest.json` and `package.json` along with the Python version.
+- `release.yml` checks the manifest's version against the tag, then typechecks, tests, and builds the plugin before publishing to PyPI. It then creates the GitHub release with the two plugin files attached.
+
+Rejected: moving the plugin to its own repository, and folder-only installs.
 
 Open questions from 2026-10-16 that are now answered: manuscript files go up as a multipart upload of the saved text; credentials are an optional bearer token kept in `api.secrets`.
