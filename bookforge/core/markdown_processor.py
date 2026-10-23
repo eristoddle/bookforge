@@ -6,6 +6,20 @@ from typing import List, Tuple
 from .models import Chapter
 
 
+FRONTMATTER_FENCE = re.compile(r'^(---|\.\.\.)\s*$')
+
+
+def strip_frontmatter(content: str) -> str:
+    """Remove a leading YAML frontmatter block (a first line of ---, closed by --- or ...)."""
+    lines = content.split('\n')
+    if not lines or lines[0].strip() != '---':
+        return content
+    for i in range(1, len(lines)):
+        if FRONTMATTER_FENCE.match(lines[i]):
+            return '\n'.join(lines[i + 1:]).lstrip('\n')
+    return content
+
+
 class MarkdownProcessor:
     """Processes markdown content into HTML suitable for EPUB"""
     
@@ -34,12 +48,16 @@ class MarkdownProcessor:
     
     def process_markdown_file(self, content: str, filename: str) -> Chapter:
         """Convert markdown content to a Chapter object"""
+        content = strip_frontmatter(content)
+
         # Extract title from first H1 or use filename
         title = self._extract_title(content)
         if not title:
             title = filename.replace('.md', '').replace('_', ' ').title()
         
-        # Convert markdown to HTML
+        # Convert markdown to HTML. One Markdown instance serves every chapter, so
+        # reset it first: otherwise footnotes and heading ids carry over.
+        self.md.reset()
         html_content = self.md.convert(content)
         
         # Clean and structure the HTML

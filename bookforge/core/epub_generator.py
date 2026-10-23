@@ -1,3 +1,4 @@
+import re
 import zipfile
 import os
 import uuid
@@ -33,7 +34,8 @@ class EPUBGenerator:
             self._create_epub_structure(temp_dir, book_structure)
             
             # Create EPUB file
-            output_filename = f"{book_structure.metadata.title.replace(' ', '_')}_{temp_id[:8]}.epub"
+            safe_title = re.sub(r'[^\w\-]+', '_', book_structure.metadata.title).strip('_') or 'book'
+            output_filename = f"{safe_title}_{temp_id[:8]}.epub"
             output_path = Path(self.settings.output_dir) / output_filename
             
             self._create_epub_file(temp_dir, output_path)
