@@ -67,7 +67,8 @@ class BookService:
         theme: str = "modern",
         language: str = "en",
         description: Optional[str] = None,
-        publisher: Optional[str] = None
+        publisher: Optional[str] = None,
+        keep_order: bool = False
     ) -> Tuple[str, Dict[str, Any]]:
         """
         Generate EPUB from markdown files
@@ -86,7 +87,7 @@ class BookService:
         
         # Process markdown files into chapters
         chapters = self.markdown_processor.extract_chapters_from_directory(
-            markdown_files
+            markdown_files, keep_order=keep_order
         )
         
         if not chapters:

@@ -20,6 +20,14 @@ def strip_frontmatter(content: str) -> str:
     return content
 
 
+MARKDOWN_EXTENSION = re.compile(r'\.(md|markdown)$', re.IGNORECASE)
+
+
+def chapter_stem(filename: str) -> str:
+    """The chapter's file name without its folder or markdown extension: 01_one.md -> 01_one."""
+    return MARKDOWN_EXTENSION.sub('', filename.replace('\\', '/').split('/')[-1])
+
+
 class MarkdownProcessor:
     """Processes markdown content into HTML suitable for EPUB"""
     
@@ -53,7 +61,7 @@ class MarkdownProcessor:
         # Extract title from first H1 or use filename
         title = self._extract_title(content)
         if not title:
-            title = filename.replace('.md', '').replace('_', ' ').title()
+            title = chapter_stem(filename).replace('_', ' ').title()
         
         # Convert markdown to HTML. One Markdown instance serves every chapter, so
         # reset it first: otherwise footnotes and heading ids carry over.
@@ -66,7 +74,7 @@ class MarkdownProcessor:
         return Chapter(
             title=title,
             content=html_content,
-            filename=filename.replace('.md', '')
+            filename=chapter_stem(filename)
         )
     
     def _extract_title(self, content: str) -> str:
@@ -96,31 +104,53 @@ class MarkdownProcessor:
         
         return str(soup)
     
-    def extract_chapters_from_directory(self, markdown_files: List[Tuple[str, str]]) -> List[Chapter]:
+    def extract_chapters_from_directory(
+        self,
+        markdown_files: List[Tuple[str, str]],
+        keep_order: bool = False
+    ) -> List[Chapter]:
         """
-        Extract chapters from a list of (filename, content) tuples
-        Returns sorted chapters based on filename or explicit ordering
+        Extract chapters from a list of (filename, content) tuples.
+        With keep_order the chapters stay in the given order; otherwise they are
+        sorted by a number in the filename, then by filename.
         """
         chapters = []
-        
+
         for filename, content in markdown_files:
             chapter = self.process_markdown_file(content, filename)
-            
-            # Try to extract order from filename (e.g., "01_chapter.md", "chapter_01.md")
-            order = self._extract_order_from_filename(filename)
-            chapter.order = order
-            
+            chapter.order = 0 if keep_order else self._extract_order_from_filename(filename)
             chapters.append(chapter)
-        
-        # Sort by order, then by filename
-        chapters.sort(key=lambda c: (c.order, c.filename))
-        
+
+        if not keep_order:
+            chapters.sort(key=lambda c: (c.order, c.filename))
+
         # Reassign sequential order numbers
         for i, chapter in enumerate(chapters):
             chapter.order = i + 1
-        
+
+        self._rewrite_chapter_links(chapters)
         return chapters
-    
+
+    def _rewrite_chapter_links(self, chapters: List[Chapter]) -> None:
+        """Point links to another uploaded markdown file at that chapter's XHTML file."""
+        # Chapter.filename already carries .xhtml
+        targets = {c.filename[:-len('.xhtml')] for c in chapters}
+        for chapter in chapters:
+            soup = BeautifulSoup(chapter.content, 'html.parser')
+            changed = False
+            for link in soup.find_all('a', href=True):
+                href = link['href']
+                path, _, fragment = href.partition('#')
+                if '://' in path or not MARKDOWN_EXTENSION.search(path):
+                    continue
+                stem = chapter_stem(path)
+                if stem not in targets:
+                    continue
+                link['href'] = f"{stem}.xhtml" + (f"#{fragment}" if fragment else '')
+                changed = True
+            if changed:
+                chapter.content = str(soup)
+
     def _extract_order_from_filename(self, filename: str) -> int:
         """Extract order number from filename"""
         # Look for patterns like "01_", "_01", "chapter01", etc.

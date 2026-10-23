@@ -30,6 +30,7 @@ class GenerateFromFilesRequest(BaseModel):
     language: str = Field("en", description="Book language")
     description: Optional[str] = Field(None, description="Book description")
     publisher: Optional[str] = Field(None, description="Publisher name")
+    keep_order: bool = Field(False, description="Keep chapters in upload order")
 
 
 class JobStatus(BaseModel):
@@ -99,6 +100,7 @@ async def generate_from_files(
     language: str = Form("en"),
     description: Optional[str] = Form(None),
     publisher: Optional[str] = Form(None),
+    keep_order: bool = Form(False),
     files: List[UploadFile] = File(...)
 ):
     """Generate EPUB from uploaded markdown files"""
@@ -135,7 +137,8 @@ async def generate_from_files(
             theme=theme,
             language=language,
             description=description,
-            publisher=publisher
+            publisher=publisher,
+            keep_order=keep_order
         )
         
         # Start background processing
@@ -280,7 +283,8 @@ async def process_files_generation(
             theme=request.theme,
             language=request.language,
             description=request.description,
-            publisher=request.publisher
+            publisher=request.publisher,
+            keep_order=request.keep_order
         )
         
         # Update job with results
