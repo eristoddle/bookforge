@@ -1,0 +1,20 @@
+{
+  "name": "veneer-plugin-bookforge",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Veneer plugin: make an EPUB from a project with a BookForge server",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "esbuild src/index.ts --bundle --format=esm --platform=neutral --outfile=main.js",
+    "typecheck": "tsc",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.1",
+    "@veneer/api": "github:eristoddle/veneer-api#8f7e74079a3d8f4620642c298609c5ab9df81ad8",
+    "esbuild": "0.28.2",
+    "typescript": "6.0.3",
+    "vitest": "5.0.5"
+  }
+}

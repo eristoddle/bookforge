@@ -1,0 +1,27 @@
+{
+  "id": "bookforge",
+  "name": "BookForge",
+  "version": "0.1.0",
+  "apiVersion": "^0.40.0",
+  "main": "main.js",
+  "contributes": {
+    "commands": [
+      { "id": "bookforge:make-epub", "title": "Make an EPUB" },
+      { "id": "bookforge:forget-token", "title": "Forget the BookForge API Token" }
+    ],
+    "surfaces": [
+      { "id": "bookforge:book", "title": "BookForge", "icon": "book-open", "side": "modal" }
+    ],
+    "settings": [
+      {
+        "id": "bookforge:server",
+        "type": "string",
+        "default": "http://localhost:8000",
+        "label": "Server address",
+        "description": "The BookForge server that makes the EPUB. A server on this computer or your network also needs its address (such as localhost:8000) allowed in Settings, Plugins, BookForge.",
+        "scope": "both"
+      }
+    ]
+  },
+  "needs": ["network", "secrets", "export"]
+}
