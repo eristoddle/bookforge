@@ -58,3 +58,23 @@ def test_links_to_uploaded_chapters_point_at_their_xhtml(client):
 def test_title_with_unsafe_characters_still_makes_a_book(client):
     book = generate(client, [("01_a.md", "# A\n")], title="Part 1: Fire/Ice?")
     assert "mimetype" in book.namelist()
+
+
+def test_themes_are_listed(client):
+    themes = client.get("/api/v1/themes").json()
+    assert {"id": "modern", "label": "Modern"} in themes
+    assert [t["id"] for t in themes] == ["modern", "classic", "minimal"]
+
+
+def test_api_is_open_without_a_token(client, monkeypatch):
+    monkeypatch.delenv("API_TOKEN", raising=False)
+    assert client.get("/api/v1/themes").status_code == 200
+
+
+def test_api_token_is_required_when_set(client, monkeypatch):
+    monkeypatch.setenv("API_TOKEN", "s3cret")
+    assert client.get("/api/v1/themes").status_code == 401
+    assert client.get("/api/v1/themes", headers={"Authorization": "Bearer nope"}).status_code == 401
+    assert client.get("/api/v1/themes", headers={"Authorization": "Bearer s3cret"}).status_code == 200
+    # Health stays open, so a client can tell "down" from "refused"
+    assert client.get("/health").status_code == 200
