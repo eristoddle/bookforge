@@ -1,14 +1,16 @@
-from fastapi import APIRouter, HTTPException, UploadFile, File, Form, BackgroundTasks
+from fastapi import APIRouter, HTTPException, UploadFile, File, Form, BackgroundTasks, Depends, Header
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
 import os
+import secrets
 import uuid
 from datetime import datetime
 
 from ..core.models import BookMetadata, GenerationJob
 from ..core.book_service import BookService
 from ..core.job_manager import JobManager
+from ..config import get_settings
 
 
 # API Models
@@ -30,6 +32,7 @@ class GenerateFromFilesRequest(BaseModel):
     language: str = Field("en", description="Book language")
     description: Optional[str] = Field(None, description="Book description")
     publisher: Optional[str] = Field(None, description="Publisher name")
+    keep_order: bool = Field(False, description="Keep chapters in upload order")
 
 
 class JobStatus(BaseModel):
@@ -52,8 +55,36 @@ class JobResponse(BaseModel):
 book_service = BookService()
 job_manager = JobManager()
 
+
+
+def require_token(authorization: Optional[str] = Header(None)):
+    """Refuse the request unless it carries the configured API token (none configured: open)."""
+    token = get_settings().api_token
+    if not token:
+        return
+    scheme, _, given = (authorization or "").partition(" ")
+    if scheme.lower() != "bearer" or not secrets.compare_digest(given.strip(), token):
+        raise HTTPException(
+            status_code=401,
+            detail="This BookForge server needs an API token.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+
 # Router
-router = APIRouter(prefix="/api/v1", tags=["epub-generation"])
+router = APIRouter(prefix="/api/v1", tags=["epub-generation"], dependencies=[Depends(require_token)])
+
+
+THEME_LABELS = {"modern": "Modern", "classic": "Classic", "minimal": "Minimal"}
+
+
+@router.get("/themes")
+async def list_themes():
+    """The themes a book can use"""
+    return [
+        {"id": theme, "label": THEME_LABELS.get(theme, theme.title())}
+        for theme in book_service.get_available_themes()
+    ]
 
 
 @router.post("/generate/github", response_model=JobResponse)
@@ -99,6 +130,7 @@ async def generate_from_files(
     language: str = Form("en"),
     description: Optional[str] = Form(None),
     publisher: Optional[str] = Form(None),
+    keep_order: bool = Form(False),
     files: List[UploadFile] = File(...)
 ):
     """Generate EPUB from uploaded markdown files"""
@@ -135,7 +167,8 @@ async def generate_from_files(
             theme=theme,
             language=language,
             description=description,
-            publisher=publisher
+            publisher=publisher,
+            keep_order=keep_order
         )
         
         # Start background processing
@@ -280,7 +313,8 @@ async def process_files_generation(
             theme=request.theme,
             language=request.language,
             description=request.description,
-            publisher=request.publisher
+            publisher=request.publisher,
+            keep_order=request.keep_order
         )
         
         # Update job with results

@@ -21,7 +21,7 @@ http://localhost:8000/api/v1
 
 ## 🔐 Authentication
 
-Currently, the API does not require authentication for basic usage. For production deployments, consider adding authentication middleware.
+The API is open unless the server sets `API_TOKEN`. When it is set, every `/api/v1` request needs the header `Authorization: Bearer <token>`, and a request without it gets `401`. `/health` stays open.
 
 ## 📖 Endpoints
 
@@ -91,7 +91,10 @@ Upload markdown files and generate an EPUB.
 - `language` (optional): Language code (default: `en`)
 - `description` (optional): Book description
 - `publisher` (optional): Publisher name
+- `keep_order` (optional): `true` keeps the chapters in upload order (default: `false`, sorted by a number in each file name, then by name)
 - `files` (required): One or more markdown files
+
+A leading YAML frontmatter block in a file is removed. A link to another uploaded file (`02_two.md`, `./02_two.md#scene`) points at that chapter in the EPUB.
 
 **Response:**
 ```json
@@ -157,6 +160,14 @@ Download the generated EPUB file.
 **Example:**
 ```bash
 curl -O "http://localhost:8000/api/v1/download/123e4567-e89b-12d3-a456-426614174000"
+```
+
+### List Themes
+
+**GET** `/api/v1/themes`
+
+```json
+[{ "id": "modern", "label": "Modern" }, { "id": "classic", "label": "Classic" }, { "id": "minimal", "label": "Minimal" }]
 ```
 
 ### List Jobs

@@ -24,6 +24,8 @@ class Settings(BaseSettings):
     epub_validation: bool = True
     
     # API configuration
+    # When set, every /api/v1 request needs "Authorization: Bearer <api_token>"
+    api_token: Optional[str] = None
     max_concurrent_jobs: int = 10
     job_timeout: int = 300
     

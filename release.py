@@ -19,6 +19,7 @@ Examples:
 """
 
 import argparse
+import json
 import re
 import subprocess
 import sys
@@ -85,6 +86,34 @@ def update_version_in_file(file_path: Path, old_version: str, new_version: str) 
     return False
 
 
+# The Veneer plugin releases with the server: its files ride on every GitHub release, and Veneer
+# needs the manifest's version to change with each tag.
+PLUGIN_VERSION_FILES = [
+    Path("veneer-plugin/manifest.json"),
+    Path("veneer-plugin/package.json"),
+]
+
+
+def update_json_version(file_path: Path, new_version: str) -> bool:
+    """Set the top-level "version" of a JSON file, keeping its formatting. Returns True if modified."""
+    if not file_path.exists():
+        print(f"Warning: {file_path} not found, skipping")
+        return False
+
+    content = file_path.read_text()
+    if json.loads(content).get("version") == new_version:
+        return False
+
+    # The top-level key is the first "version" at two-space indent
+    updated = re.sub(r'^(  "version": )"[^"]*"', rf'\g<1>"{new_version}"', content, count=1, flags=re.M)
+    if json.loads(updated).get("version") != new_version:
+        raise ValueError(f"Could not update the version in {file_path}")
+
+    file_path.write_text(updated)
+    print(f"Updated version in {file_path}")
+    return True
+
+
 def update_all_versions(old_version: str, new_version: str) -> List[Path]:
     """Update version in all relevant files."""
     files_to_update = [
@@ -102,6 +131,10 @@ def update_all_versions(old_version: str, new_version: str) -> List[Path]:
     
     for file_path in files_to_update:
         if update_version_in_file(file_path, old_version, new_version):
+            modified_files.append(file_path)
+
+    for file_path in PLUGIN_VERSION_FILES:
+        if update_json_version(file_path, new_version):
             modified_files.append(file_path)
     
     # Check additional files for version references
