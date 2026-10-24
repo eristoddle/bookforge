@@ -26,7 +26,7 @@ npm run typecheck
 npm run build        # bundles main.js (esbuild, one ES module)
 ```
 
-`@veneer/api` is pinned to commit `8f7e740` of https://github.com/eristoddle/veneer-api, which is the 0.40.0 release. The `v0.40.0` tag is not on GitHub yet; once it is, switch the dependency to `github:eristoddle/veneer-api#v0.40.0`.
+`@veneer/api` is pinned to the `v0.40.0` tag of https://github.com/eristoddle/veneer-api.
 
 To try it in Veneer: a dev build has **Load plugin from folder** in the palette; point it at this folder after `npm run build`. A packaged Veneer can install from the folder or a zip in Settings, Plugins. Run a server with `python -m bookforge.main` from the repository root.
 
