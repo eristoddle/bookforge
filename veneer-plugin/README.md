@@ -1,6 +1,6 @@
 # BookForge for Veneer
 
-A [Veneer](https://github.com/eristoddle/veneer) plugin that turns a project's markdown documents into an EPUB with a BookForge server (this repository). Built on `@veneer/api` 0.40.0 and nothing else.
+A [Veneer](https://github.com/eristoddle/veneer) plugin that turns a project's markdown documents into an EPUB with a BookForge server (this repository). Built on `@veneer/api` 0.46.0 and nothing else.
 
 ## What the writer does
 
@@ -26,7 +26,7 @@ npm run typecheck
 npm run build        # bundles main.js (esbuild, one ES module)
 ```
 
-`@veneer/api` is pinned to the `v0.40.0` tag of https://github.com/eristoddle/veneer-api.
+`@veneer/api` is pinned to the `v0.46.0` tag of https://github.com/eristoddle/veneer-api.
 
 To try it in Veneer: a dev build has **Load plugin from folder** in the palette; point it at this folder after `npm run build`. A packaged Veneer can install from the folder or a zip in Settings, Plugins. Run a server with `python -m bookforge.main` from the repository root.
 
